@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:18:23 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>后台管理系统-登录</title>
+    <meta name="keywords" content="后台管理系统-登录">
+    <meta name="description" content="后台管理系统-登录">
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="/static/admin/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>if(window.top !== window.self){ window.top.location = window.location;}</script>
+</head>
+
+<body class="gray-bg" style="background: url('/static/admin/img/image.jpg') no-repeat center center;   background-size:cover;">
+
+<div class="middle-box text-center loginscreen  animated fadeInDown">
+    <div>
+        <div>
+
+            <h1 class="logo-name">^_^</h1>
+
+        </div>
+
+
+        <form class="m-t" role="form" id="my-form" method="post" action="{:url('/admin/logging')}">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="用户名" name="user" required="">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="密码" name="pwd" required="">
+            </div>
+            {eq name=":config('captcha_type')" value="1"}
+            <div id="embed-captcha"></div>
+            <p id="wait" class="show">正在加载验证码......</p>
+            <p id="notice" class="hide">请先完成验证</p>
+            <br>
+            {else/}
+            <div class="form-group">
+               <input type="text" class="form-control" name="captcha" placeholder="验证码" />
+            </div>
+            <div class="form-group" >
+               <img src="{:url('admin/captcha')}" id="captcha_image" onclick="$(this).attr('src','{:url('admin/captcha')}' + '?rnd=' + (new Date()).getTime());"  style="cursor: pointer;" title="点击刷新验证码">
+            </div>
+            {/eq}
+            <button type="submit" class="btn btn-primary block full-width m-b">登 录</button>
+
+
+
+            </p>
+
+        </form>
+    </div>
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+{eq name=":config('captcha_type')" value="1"}
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/gt.js"></script>
+<script>
+    var handlerEmbed = function (captchaObj) {
+        $("#embed-submit").click(function (e) {
+            var validate = captchaObj.getValidate();
+            if (!validate) {
+                $("#notice")[0].className = "show";
+                setTimeout(function () {
+                    $("#notice")[0].className = "hide";
+                }, 2000);
+                e.preventDefault();
+            }
+        });
+        // 将验证码加到id为captcha的元素里，同时会有三个input的值：geetest_challenge, geetest_validate, geetest_seccode
+        captchaObj.appendTo("#embed-captcha");
+        captchaObj.bindForm('#my-form');
+        captchaObj.onReady(function () {
+            $("#wait")[0].className = "hide";
+        });
+        // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+    };
+    $.ajax({
+        // 获取id，challenge，success（是否启用failback）
+        url: "{:url('/admin/geetest',null,false)}?t=" + (new Date()).getTime(), // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 使用initGeetest接口
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                new_captcha: data.new_captcha,
+                product: "popup", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
+            }, handlerEmbed);
+
+        }
+    });
+</script>
+{/eq}
+
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:18:23 GMT -->
+</html>
+
+
